@@ -1,6 +1,7 @@
 import numpy as np
 from Utils import *
 from Graph import *
+import sys
 
 
 class SimResult:
@@ -55,7 +56,7 @@ class SimResult:
             else:
                 # TODO 存在文件残缺对,直接扫描扫描文件即可,无法分清函数的增加还是删除，这部分不会执行，上面使用change进行标注，已经解决了。
                 # self.normaldiff.append(file.replace(".txt", ""))
-                print("是否进入")
+                # print("是否进入")
                 pass
         return self.normaldiff, self.connectdiff, self.deletediff, self.adddiff, self.nomatch
 
@@ -82,14 +83,14 @@ class SimResult:
             s = methodTupeValue[0][0]
             if np.allclose(s, 1.0, self.eps):
                 # 0.1的误差范围内，则认为是相似的，没有发生变化
-                print("相似函数:{name}".format(name=methodTupeKey[1]))
+                print("simMethod:{name}".format(name=methodTupeKey[1]))
             else:
                 # 发生了变化，需要根据程度进行判断，分析相关的部分
                 # TODO 这个需要把前面的路径去掉。
                 pfile = file.replace(".txt", "")
                 filename = pfile[start:len(pfile)]
                 #############################################
-                print("发生变化函数：{name}".format(name=file.replace(".txt", "") + "&" + candiate_filename2))
+                print("diffMethod：{name}".format(name=file.replace(".txt", "") + "&" + candiate_filename2))
                 self.normaldiff.append(filename + "&" + candiate_filename2)
                 # 关联分析得到的函数变化
                 self.Node2NodeConnect(file, methodTupeKey[1])
@@ -121,14 +122,16 @@ class SimResult:
                     for referFile in callMethodNameReferT.values():
                         # TODO referFile可能需要进行文件名的解析
                         self.connectdiff.append(referFile)
-                        print("函数调用文件：{name}".format(name=referFile))
+                        print("callReferMethod：{name}".format(name=referFile))
 
 
 if __name__ == '__main__':
     # current path
     ospwd = os.path.split(os.path.realpath(__file__))[0]
     oldversion, newversion = getVersion(os.path.join(ospwd, "jsondata"))
-
+    print("pwd:" + ospwd)
+    # 传入保存的地址
+    saveurl = sys.argv[1]
     low_version = os.path.join(ospwd, os.path.join("jsondata", oldversion))
     high_version = os.path.join(ospwd, os.path.join("jsondata", newversion))
     base_file_list = []
@@ -148,5 +151,5 @@ if __name__ == '__main__':
     dic["deletediff"] = deletediff
     dic["adddiff"] = adddiff
     dic["nomatch"] = nomatch
-    toText(dic, "./", "result.txt", oldversion, newversion)
+    toText(dic, saveurl, "result.txt", oldversion, newversion)
     print("done!")

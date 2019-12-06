@@ -378,6 +378,8 @@ def toText(dic, url, name, oldversion, newversion):
     # 在给定的路径下写入文件
     mode = ""
     path = os.path.join(url, name)
+
+    print("Path:" + path)
     with open(path, mode="w") as file:
         for type in dic.keys():
             for line in dic[type]:
